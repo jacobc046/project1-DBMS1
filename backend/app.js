@@ -106,6 +106,19 @@ app.get('/searchUsersByJoined/afterDay/:username', (request, response) => {
     .catch(err => console.log(err));
 });
 
+app.get('/searchByAge/:minAge/:maxAge', (request, response) => {
+    console.log("app: search users by age");
+    const minAge = request.params.minAge;
+    const maxAge = request.params.maxAge;
+
+    const db = dbService.getDbServiceInstance();
+    const result = db.searchByAge(minAge, maxAge); 
+
+    result
+    .then(data => response.json({data: data}))
+    .catch(err => console.log(err));
+});
+
 // read 
 app.get('/getAll', (request, response) => {
     

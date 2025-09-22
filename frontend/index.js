@@ -120,10 +120,23 @@ salarySearchBtn.onclick = function() {
 
 const searchUsersByUsernameJoined = document.querySelector("#users-by-username-joined-btn");
 searchUsersByUsernameJoined.onclick = function() {
-    fetch('http://localhost:5050/searchUsersByUsernameJoined' + type + '/' + username)
+    const type = document.querySelector('#users-by-username-joined-option').value;
+    const username = document.querySelector('#users-by-username-joined-input').value;
+
+    fetch(`http://localhost:5050/searchUsersByUsernameJoined/${type}/${username}`)
     .then(response => response.json())
     .then(data => loadHTMLTable(data['data']));
 } 
+
+const searchByAge = document.querySelector("#search-age-btn");
+searchByAge.onclick = function() {
+    const minAge = document.querySelector('#search-age-lower-input').value;
+    const maxAge = document.querySelector('#search-age-upper-input').value;
+
+    fetch(`http://localhost:5050/searchByAge/${minAge}/${maxAge}`)
+    .then(response => response.json())
+    .then(data => loadHTMLTable(data['data']));
+}
 
 let rowToDelete; 
 

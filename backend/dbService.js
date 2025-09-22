@@ -262,6 +262,19 @@ class DbService{
       return response;
    }
 
+   async searchByAge(minAge, maxAge) {
+      const response = await new Promise((resolve, reject) => 
+      {
+         const query = "SELECT * FROM Users where age >= ? AND age <= ?;";
+         connection.query(query, [minAge, maxAge], (err, results) => {
+               if(err) reject(new Error(err.message));
+               else resolve(results);
+         });
+      });
+      // console.log(response);  // for debugging to see the result of select
+      return response;
+   }
+
    async deleteRowByUsername(username){
          try{
               // use await to call an asynchronous function
