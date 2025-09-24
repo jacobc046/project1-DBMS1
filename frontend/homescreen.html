@@ -1,82 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="stylesheet.css">
-  <title>DB Project 1 new</title>
-</head>
-<body>
-  <main>
-      <label>Name:</label>
-      <input type="text" id="name-input">
-      <button id="add-name-btn">Add Name</button>
- 
-     <br><br><br>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="stylesheet.css" />
+    <title>Project 1 Dashboard</title>
+  </head>
+  <body>
+    <main>
+      <h1>Search for Users based on the following criteria:</h1>
+      <!-- <label>Name:</label>
+      <input type="text" id="name-input" />
+      <button id="add-name-btn">Add Name</button> -->
 
-     <!-- Search by name -->
-     <div> 
-        <input placeholder="search by first name, last name, or username" id="search-input">
+      <!-- <br /><br /><br /> -->
+
+      <!-- Search by name -->
+      <div>
+        <input placeholder="first, last, or username" id="search-input" />
         <button id="search-btn">Search</button>
-     </div>
+      </div>
 
-     <br>
-     <br>
+      <br />
+      <br />
 
-     <!-- Search by salary -->
-     <div>
+      <!-- Search by salary -->
+      <div>
         <label for="search-salary-btn">Salary range:</label>
-        <input id="search-salary-lower-input" placeholder="min">
-        <input id="search-salary-upper-input" placeholder="max">
+        <input id="search-salary-lower-input" placeholder="min" />
+        <input id="search-salary-upper-input" placeholder="max" />
         <button id="search-salary-btn">Search</button>
-     </div>
-     <br>
-     <br>
+      </div>
+      <br />
+      <br />
 
-     <!-- Search by user join date -->
-     <div>
+      <!-- Search by user join date -->
+      <div>
         <label>Search users who joined on same day or after a user:</label>
-        <input id="users-by-username-joined-input" placeholder="username">
+        <input id="users-by-username-joined-input" placeholder="username" />
         <select id="users-by-username-joined-option">
-            <option>Same day</option>
-            <option>After</option>
+          <option>Same day</option>
+          <option>After</option>
         </select>
         <button id="users-by-username-joined-btn">Search</button>
-     </div>
+      </div>
 
-     <br>
-     <br>
+      <br />
+      <br />
 
-     <!-- Search by age -->
-     <div>
+      <!-- Search by age -->
+      <div>
         <label>Search users by age</label>
-        <input id="search-age-lower-input" placeholder="min">
-        <input id="search-age-upper-input" placeholder="max">
+        <input id="search-age-lower-input" placeholder="min" />
+        <input id="search-age-upper-input" placeholder="max" />
         <button id="search-age-btn">Search</button>
-     </div>
+      </div>
 
-     <br>
-     <br>
+      <br />
+      <br />
 
-     <table id="table">
-         <thead>
-             <th>Id</th>
-             <th>Name</th>
-             <th>Date Added</th>
-             <th>Delete</th>
-             <th>Edit</th>  
-         </thead>
-         <tbody></tbody>
-     </table>
+      <table id="table">
+        <thead>
+          <th>Id</th>
+          <th>Name</th>
+          <th>Date Added</th>
+          <th>Delete</th>
+          <th>Edit</th>
+        </thead>
+        <tbody></tbody>
+      </table>
 
-     <section hidden id="update-row">
-         <label>Name:</label>
-         <input type="text" id="update-name-input">
-         <button id="update-row-btn" value="">Update</button>
-    </section>
+      <section hidden id="update-row">
+        <label>Name:</label>
+        <input type="text" id="update-name-input" />
+        <button id="update-row-btn" value="">Update</button>
+      </section>
 
-    <a href="index.html">Back to login</a>
-</main>
-<script src="index.js"></script>
-</body>
+      <a href="index.html">Back to login</a>
+    </main>
+    <script src="index.js"></script>
+  </body>
 </html>
