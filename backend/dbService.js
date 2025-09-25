@@ -2,12 +2,11 @@
 
 const mysql = require('mysql');
 const dotenv = require('dotenv');
+const bcrypt = require('bcrypt');
+
 dotenv.config(); // read from .env file
 
 let instance = null; 
-
-
-// if you use .env to configure
 
 console.log("HOST: " + process.env.HOST);
 console.log("DB USER: " + process.env.DB_USER);
@@ -29,6 +28,12 @@ connection.connect((err) => {
      }
      console.log('db ' + connection.state);    // to see if the DB is connected or not
 });
+
+async function hashPassword(plainPassword) {
+        const salt = await bcrypt.genSalt(10); // dont change this number - passwords will break
+        const hash = await bcrypt.hash(plainPassword, salt);
+        return hash;
+    }
 
 // the following are database functions, 
 
@@ -101,8 +106,9 @@ class DbService{
 
    async signUpUser(userData){
          try{
-            const registerDay = new Date();
-            const signInTime = new Date();
+            const now = new Date();
+            const hashedPassword = await hashPassword(userData.password);
+
             // use await to call an asynchronous function
             const insertUser = await new Promise((resolve, reject) => 
             {
@@ -110,13 +116,13 @@ class DbService{
                VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
                connection.query(query, [
                   userData.username,
-                  userData.password,
+                  hashedPassword,
                   userData.firstName,
                   userData.lastName,
                   userData.salary,
                   userData.age,
-                  registerDay,
-                  signInTime
+                  now, //registerday
+                  now //signintime
                ], (err, result) => {
                    if(err) reject(new Error(err.message));
                    else resolve(result.insertId);
@@ -125,7 +131,7 @@ class DbService{
             //console.log(insertUser);  // for debugging to see the result of insert
             return{
                  username: userData.username,
-                 password: userData.password,
+                 password: hashedPassword,
                  firstname: userData.firstname,
                  lastname: userData.lastname,
                  salary: userData.salary,
@@ -139,9 +145,11 @@ class DbService{
    }
 
    async signInUser(userData) {
+      const hashedPassword = await hashPassword(userData.password);
+
       const response = await new Promise((resolve, reject) => {
          const query = `SELECT username, password FROM Users WHERE username = ? AND password = ?;`;
-         connection.query(query, [userData.username, userData.password], (err, result) => {
+         connection.query(query, [userData.username, hashedPassword], (err, result) => {
                if(err) reject(new Error(err.message));
                else {
                   if (result.length > 0) {
