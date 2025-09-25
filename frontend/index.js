@@ -113,20 +113,23 @@ salarySearchBtn.onclick = function() {
     .then(data => loadHTMLTable(data['data']));
 }
 
-//search by dates
-// const searchByDateBtn = document.querySelector("#search-by-date-btn");
-// searchByDateBtn.onclick = function() {
-// }
+//search using join date of another user
+const searchByOtherUserJoinedBtn = document.querySelector("#users-by-when-other-user-joined-btn");
+searchByOtherUserJoinedBtn.onclick = function() {
+    const searchByOtherUserJoinedType = document.querySelector('#users-by-when-other-user-joined-option').value;
+    const otherUser = document.querySelector('#users-by-when-other-user-joined-input').value;
 
-const searchUsersByUsernameJoined = document.querySelector("#users-by-username-joined-btn");
-searchUsersByUsernameJoined.onclick = function() {
-    const type = document.querySelector('#users-by-username-joined-option').value;
-    const username = document.querySelector('#users-by-username-joined-input').value;
+    if (searchByOtherUserJoinedType == "Same day") {
+        fetch(`http://localhost:5050/searchUsersByJoined/sameDay/${otherUser}`)
+        .then(response => response.json())
+        .then(data => loadHTMLTable(data['data']));
 
-    fetch(`http://localhost:5050/searchUsersByUsernameJoined/${type}/${username}`)
-    .then(response => response.json())
-    .then(data => loadHTMLTable(data['data']));
-} 
+    } else {
+        fetch(`http://localhost:5050/searchUsersByJoined/after/${otherUser}`)
+        .then(response => response.json())
+        .then(data => loadHTMLTable(data['data']));
+    }
+}
 
 const searchByAge = document.querySelector("#search-age-btn");
 searchByAge.onclick = function() {

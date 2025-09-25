@@ -73,22 +73,24 @@ app.get('/searchSalary/:minInput/:maxInput', (request, response) => {
     .catch(err => console.log(err));
 });
 
-app.get('/searchUsersByJoined/sameDay/:username', (request, response) => {
-    console.log("app: search users by same day joined");
+app.get('/searchUsersByJoined/sameDay/:otherUser', (request, response) => {
+    console.log("app: search users who joined same day");
+    const otherUser = request.params.otherUser;
 
     const db = dbService.getDbServiceInstance();
-    const result = db.searchBySameDayJoined(); 
+    const result = db.searchByJoinedSameDay(otherUser); 
 
     result
     .then(data => response.json({data: data}))
     .catch(err => console.log(err));
 });
 
-app.get('/searchUsersByJoined/sameDay/:username', (request, response) => {
-    console.log("app: search users by same day joined");
+app.get('/searchUsersByJoined/after/:otherUser', (request, response) => {
+    console.log("app: search users who joined after date");
+    const otherUser = request.params.otherUser;
 
     const db = dbService.getDbServiceInstance();
-    const result = db.searchByJoinedSameDay(); 
+    const result = db.searchByJoinedAfter(otherUser); 
 
     result
     .then(data => response.json({data: data}))

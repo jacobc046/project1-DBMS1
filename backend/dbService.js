@@ -216,44 +216,24 @@ class DbService{
       return response;
    }
 
-   async searchByJoinedAfterUser(username) {
-      const userDateJoined = await new Promise((resolve, reject) => 
+   async searchByJoinedSameDay(username) {
+      const response = await new Promise((resolve, reject) => 
       {
-         const query = "SELECT registerdate FROM Users where username = ?;";
+         const query = `SELECT * FROM Users WHERE registerday = (SELECT registerday FROM Users WHERE username = ?);`;
          connection.query(query, [username], (err, results) => {
                if(err) reject(new Error(err.message));
                else resolve(results);
          });
       });
 
-      const response = await new Promise((resolve, reject) => 
-      {
-         const query = "SELECT * FROM Users where registerdate > ?;";
-         connection.query(query, [userDateJoined], (err, results) => {
-               if(err) reject(new Error(err.message));
-               else resolve(results);
-         });
-      });
-
-      return response;
+      return response; 
    }
 
-   async searchByJoinedSameDay(username) {
-      const userDateJoined = await new Promise((resolve, reject) => 
-      {
-         const query = "SELECT registerdate FROM Users where username = ?;";
-         connection.query(query, [username], (err, results) => {
-               if(err) reject(new Error(err.message));
-               else resolve(results);
-         });
-      });
-
-      const today = new Date();
-
+   async searchByJoinedAfter(username) {
       const response = await new Promise((resolve, reject) => 
       {
-         const query = "SELECT * FROM Users where registerdate = ?;";
-         connection.query(query, [today], (err, results) => {
+         const query = `SELECT * FROM Users WHERE registerday > (SELECT registerday FROM Users WHERE username = ?);`;
+         connection.query(query, [username], (err, results) => {
                if(err) reject(new Error(err.message));
                else resolve(results);
          });
