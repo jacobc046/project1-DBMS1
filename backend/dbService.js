@@ -139,20 +139,28 @@ class DbService{
    }
 
    async signInUser(userData) {
-      const response = await new Promise((resolve, reject) => 
-         {
-            const query = `SELECT username, password FROM Users WHERE username = ? AND password = ?;`;
-            connection.query(query, [userData.username, userData.password], (err, result) => {
-                  if(err) reject(new Error(err.message));
-                  else {
-                     if (result.length > 0) {
-                        resolve({ success: true, user: result[0] });
-                     } else {
-                        resolve({ success: false, message: "Invalid username or password" });
-                     }
+      const response = await new Promise((resolve, reject) => {
+         const query = `SELECT username, password FROM Users WHERE username = ? AND password = ?;`;
+         connection.query(query, [userData.username, userData.password], (err, result) => {
+               if(err) reject(new Error(err.message));
+               else {
+                  if (result.length > 0) {
+                     resolve({ success: true, user: result[0] });
+                  } else {
+                     resolve({ success: false, message: "Invalid username or password" });
                   }
-            });
+               }
          });
+      });
+
+      await new Promise((resolve, reject) => {
+         const today = new Date();
+         const query = `UPDATE Users SET signintime = ? WHERE username = ?;`;
+         connection.query(query, [today, userData.username], (err, result) => {
+               if(err) reject(new Error(err.message));
+               else resolve(result);
+         });
+      });
 
       return response;
    }
