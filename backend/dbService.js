@@ -75,24 +75,23 @@ class DbService {
    to work with the asynchronous nature of the connection.query method, allowing 
    the function to pause until the query is completed.
    */
-  async getAllData() {
-    try {
-      // use await to call an asynchronous function
-      const response = await new Promise((resolve, reject) => {
-        const query = "SELECT * FROM Users;";
-        connection.query(query, (err, results) => {
-          if (err) reject(new Error(err.message));
-          else resolve(results);
-        });
-      });
 
-      // console.log("dbServices.js: search result:");
-      // console.log(response);  // for debugging to see the result of select
-      return response;
-    } catch (error) {
-      console.log(error);
-    }
+async getAllData() {
+  try {
+    // use await to call an asynchronous function
+    const response = await new Promise((resolve, reject) => {
+      const query = "SELECT * FROM Users;";
+      connection.query(query, (err, results) => {
+        if (err) reject(new Error(err.message));
+        else resolve(results);
+      });
+    });
+
+    return response;
+  } catch (error) {
+    console.log(error);
   }
+}
 
   async signUpUser(userData) {
     try {
@@ -222,48 +221,6 @@ class DbService {
     return response;
   }
 
-  async searchByJoinedAfterUser(username) {
-    const userDateJoined = await new Promise((resolve, reject) => {
-      const query = "SELECT registerdate FROM Users where username = ?;";
-      connection.query(query, [username], (err, results) => {
-        if (err) reject(new Error(err.message));
-        else resolve(results);
-      });
-    });
-
-    const response = await new Promise((resolve, reject) => {
-      const query = "SELECT * FROM Users where registerdate > ?;";
-      connection.query(query, [userDateJoined], (err, results) => {
-        if (err) reject(new Error(err.message));
-        else resolve(results);
-      });
-    });
-
-    return response;
-  }
-
-  async searchByJoinedSameDay(username) {
-    const userDateJoined = await new Promise((resolve, reject) => {
-      const query = "SELECT registerdate FROM Users where username = ?;";
-      connection.query(query, [username], (err, results) => {
-        if (err) reject(new Error(err.message));
-        else resolve(results);
-      });
-    });
-
-    const today = new Date();
-
-    const response = await new Promise((resolve, reject) => {
-      const query = "SELECT * FROM Users where registerdate = ?;";
-      connection.query(query, [today], (err, results) => {
-        if (err) reject(new Error(err.message));
-        else resolve(results);
-      });
-    });
-
-    return response;
-  }
-
   async searchByAge(minAge, maxAge) {
     const response = await new Promise((resolve, reject) => {
       const query = "SELECT * FROM Users where age >= ? AND age <= ?;";
@@ -310,14 +267,43 @@ class DbService {
     }
   }
 
-  async searchNeverSignedIn() {
-    try {
-      const response = await new Promise((resolve, reject) => {
-        const query = "SELECT * FROM Users WHERE signintime IS NULL;";
-        connection.query(query, (err, results) => {
-          if (err) reject(new Error(err.message));
-          else resolve(results);
-        });
+async searchNeverSignedIn() {
+  try {
+    const response = await new Promise((resolve, reject) => {
+      const query = "SELECT * FROM Users WHERE signintime IS NULL;";
+      connection.query(query, (err, results) => {
+        if (err) reject(new Error(err.message));
+        else resolve(results);
+      });
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+   async searchByJoinedSameDay(username) {
+      const response = await new Promise((resolve, reject) => 
+      {
+         const query = `SELECT * FROM Users WHERE registerday = (SELECT registerday FROM Users WHERE username = ?);`;
+         connection.query(query, [username], (err, results) => {
+               if(err) reject(new Error(err.message));
+               else resolve(results);
+         });
+      });
+
+      return response; 
+   }
+
+   async searchByJoinedAfter(username) {
+      const response = await new Promise((resolve, reject) => 
+      {
+         const query = `SELECT * FROM Users WHERE registerday > (SELECT registerday FROM Users WHERE username = ?);`;
+         connection.query(query, [username], (err, results) => {
+               if(err) reject(new Error(err.message));
+               else resolve(results);
+         });
+
       });
 
       return response;
