@@ -71,42 +71,26 @@ app.get("/searchSalary/:minInput/:maxInput", (request, response) => {
     .catch((err) => console.log(err));
 });
 
-
-app.get("/searchUsersByJoined/sameDay/:username", (request, response) => {
-  console.log("app: search users by same day joined");
-
+app.get("/searchUsersByJoined/sameDay/:username", (req, res) => {
+  const { username } = req.params;
   const db = dbService.getDbServiceInstance();
-  const result = db.searchBySameDayJoined();
-
-app.get('/searchUsersByJoined/sameDay/:otherUser', (request, response) => {
-    console.log("app: search users who joined same day");
-    const otherUser = request.params.otherUser;
-
-    const db = dbService.getDbServiceInstance();
-    const result = db.searchByJoinedSameDay(otherUser); 
-
-
-  result
-    .then((data) => response.json({ data: data }))
-    .catch((err) => console.log(err));
+  db.searchByJoinedSameDay(username)
+    .then((data) => res.json({ data }))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ error: "server" });
+    });
 });
 
-
-
-  result
-    .then((data) => response.json({ data: data }))
-    .catch((err) => console.log(err));
-});
-
-app.get("/searchUsersByJoined/afterDay/:username", (request, response) => {
-  console.log("app: search users by same day joined");
-
+app.get("/searchUsersByJoined/after/:username", (req, res) => {
+  const { username } = req.params;
   const db = dbService.getDbServiceInstance();
-  const result = db.searchByJoinedAfterUser();
-
-  result
-    .then((data) => response.json({ data: data }))
-    .catch((err) => console.log(err));
+  db.searchByJoinedAfter(username)
+    .then((data) => res.json({ data }))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ error: "server" });
+    });
 });
 
 app.get("/searchByAge/:minAge/:maxAge", (request, response) => {

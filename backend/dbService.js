@@ -76,22 +76,22 @@ class DbService {
    the function to pause until the query is completed.
    */
 
-async getAllData() {
-  try {
-    // use await to call an asynchronous function
-    const response = await new Promise((resolve, reject) => {
-      const query = "SELECT * FROM Users;";
-      connection.query(query, (err, results) => {
-        if (err) reject(new Error(err.message));
-        else resolve(results);
+  async getAllData() {
+    try {
+      // use await to call an asynchronous function
+      const response = await new Promise((resolve, reject) => {
+        const query = "SELECT * FROM Users;";
+        connection.query(query, (err, results) => {
+          if (err) reject(new Error(err.message));
+          else resolve(results);
+        });
       });
-    });
 
-    return response;
-  } catch (error) {
-    console.log(error);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
   }
-}
 
   async signUpUser(userData) {
     try {
@@ -267,48 +267,58 @@ async getAllData() {
     }
   }
 
-async searchNeverSignedIn() {
-  try {
-    const response = await new Promise((resolve, reject) => {
-      const query = "SELECT * FROM Users WHERE signintime IS NULL;";
-      connection.query(query, (err, results) => {
-        if (err) reject(new Error(err.message));
-        else resolve(results);
+  async searchNeverSignedIn() {
+    try {
+      const response = await new Promise((resolve, reject) => {
+        const query = "SELECT * FROM Users WHERE signintime IS NULL;";
+        connection.query(query, (err, results) => {
+          if (err) reject(new Error(err.message));
+          else resolve(results);
+        });
       });
-    });
-    return response;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-   async searchByJoinedSameDay(username) {
-      const response = await new Promise((resolve, reject) => 
-      {
-         const query = `SELECT * FROM Users WHERE registerday = (SELECT registerday FROM Users WHERE username = ?);`;
-         connection.query(query, [username], (err, results) => {
-               if(err) reject(new Error(err.message));
-               else resolve(results);
-         });
-      });
-
-      return response; 
-   }
-
-   async searchByJoinedAfter(username) {
-      const response = await new Promise((resolve, reject) => 
-      {
-         const query = `SELECT * FROM Users WHERE registerday > (SELECT registerday FROM Users WHERE username = ?);`;
-         connection.query(query, [username], (err, results) => {
-               if(err) reject(new Error(err.message));
-               else resolve(results);
-         });
-
-      });
-
       return response;
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async searchByJoinedSameDay(username) {
+    try {
+      const results = await new Promise((resolve, reject) => {
+        const sql = `
+         SELECT *
+         FROM Users
+         WHERE DATE(registerday) = (
+           SELECT DATE(registerday) FROM Users WHERE username = ?
+         );
+       `;
+        connection.query(sql, [username], (err, rows) =>
+          err ? reject(new Error(err.message)) : resolve(rows)
+        );
+      });
+      return results;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async searchByJoinedAfter(username) {
+    try {
+      const results = await new Promise((resolve, reject) => {
+        const sql = `
+         SELECT *
+         FROM Users
+         WHERE registerday > (
+           SELECT registerday FROM Users WHERE username = ?
+         );
+       `;
+        connection.query(sql, [username], (err, rows) =>
+          err ? reject(new Error(err.message)) : resolve(rows)
+        );
+      });
+      return results;
+    } catch (e) {
+      console.log(e);
     }
   }
 
