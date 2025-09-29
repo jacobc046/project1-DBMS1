@@ -1,4 +1,3 @@
-
 // This is the frontEnd that modifies the HTML page directly
 // event-based programming,such as document load, click a button
 
@@ -62,56 +61,56 @@ Arrow functions have a few notable features:
       especially when dealing with callbacks and event handlers.
 */
 
-
 // fetch call is to call the backend
 
-document.addEventListener('DOMContentLoaded', function() {
-    // one can point your browser to http://localhost:5050/getAll to check what it returns first.
-    fetch('http://localhost:5050/getAll')     
-    .then(response => response.json())
-    .then(data => loadHTMLTable(data['data']));
+document.addEventListener("DOMContentLoaded", function () {
+  // one can point your browser to http://localhost:5050/getAll to check what it returns first.
+  fetch("http://localhost:5050/getAll")
+    .then((response) => response.json())
+    .then((data) => loadHTMLTable(data["data"]));
 });
 
 // when the addBtn is clicked
-const addBtn = document.querySelector('#add-name-btn');
-addBtn.onclick = function (){
-    const nameInput = document.querySelector('#name-input');
-    const name = nameInput.value;
-    nameInput.value = "";
+const addBtn = document.querySelector("#add-name-btn");
+addBtn.onclick = function () {
+  const nameInput = document.querySelector("#name-input");
+  const name = nameInput.value;
+  nameInput.value = "";
 
-    fetch('http://localhost:5050/insert', {
-        headers: {
-            'Content-type': 'application/json'
-        },
-        method: 'POST',
-        body: JSON.stringify({name: name})
-    })
-    .then(response => response.json())
-    .then(data => insertRowIntoTable(data['data']));
-}
+  fetch("http://localhost:5050/insert", {
+    headers: {
+      "Content-type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({ name: name }),
+  })
+    .then((response) => response.json())
+    .then((data) => insertRowIntoTable(data["data"]));
+};
 
 // when the searchBtn is clicked
-const searchBtn =  document.querySelector('#search-btn');
-searchBtn.onclick = function (){
-    const searchInput = document.querySelector('#search-input');
-    const searchValue = searchInput.value;
-    searchInput.value = "";
+const searchBtn = document.querySelector("#search-btn");
+searchBtn.onclick = function () {
+  const searchInput = document.querySelector("#search-input");
+  const searchValue = searchInput.value;
+  searchInput.value = "";
 
-    fetch('http://localhost:5050/search/' + searchValue)
-    .then(response => response.json())
-    .then(data => loadHTMLTable(data['data']));
-}
+  fetch("http://localhost:5050/search/" + searchValue)
+    .then((response) => response.json())
+    .then((data) => loadHTMLTable(data["data"]));
+};
 
 //search salary
 const salarySearchBtn = document.querySelector("#search-salary-btn");
-salarySearchBtn.onclick = function() {
-    const minInput = document.querySelector('#search-salary-lower-input').value;
-    const maxInput = document.querySelector('#search-salary-upper-input').value;
+salarySearchBtn.onclick = function () {
+  const minInput = document.querySelector("#search-salary-lower-input").value;
+  const maxInput = document.querySelector("#search-salary-upper-input").value;
 
-    fetch(`http://localhost:5050/searchSalary/${minInput}/${maxInput}`)
-    .then(response => response.json())
-    .then(data => loadHTMLTable(data['data']));
-}
+  fetch(`http://localhost:5050/searchSalary/${minInput}/${maxInput}`)
+    .then((response) => response.json())
+    .then((data) => loadHTMLTable(data["data"]));
+};
+
 
 //search using join date of another user
 const searchByOtherUserJoinedBtn = document.querySelector("#users-by-when-other-user-joined-btn");
@@ -131,165 +130,173 @@ searchByOtherUserJoinedBtn.onclick = function() {
     }
 }
 
+
 const searchByAge = document.querySelector("#search-age-btn");
-searchByAge.onclick = function() {
-    const minAge = document.querySelector('#search-age-lower-input').value;
-    const maxAge = document.querySelector('#search-age-upper-input').value;
+searchByAge.onclick = function () {
+  const minAge = document.querySelector("#search-age-lower-input").value;
+  const maxAge = document.querySelector("#search-age-upper-input").value;
 
-    fetch(`http://localhost:5050/searchByAge/${minAge}/${maxAge}`)
-    .then(response => response.json())
-    .then(data => loadHTMLTable(data['data']));
-}
+  fetch(`http://localhost:5050/searchByAge/${minAge}/${maxAge}`)
+    .then((response) => response.json())
+    .then((data) => loadHTMLTable(data["data"]));
+};
 
-let rowToDelete; 
+let rowToDelete;
 
 // when the delete button is clicked, since it is not part of the DOM tree, we need to do it differently
-document.querySelector('table tbody').addEventListener('click', 
-      function(event){        
-        if(event.target.className === "delete-row-btn"){
+document
+  .querySelector("table tbody")
+  .addEventListener("click", function (event) {
+    if (event.target.className === "delete-row-btn") {
+      deleteRowByUsername(event.target.dataset.id);
+      rowToDelete = event.target.parentNode.parentNode.rowIndex;
+      debug("delete which one: " + rowToDelete);
+    }
+    if (event.target.className === "edit-row-btn") {
+      showEditRowInterface(event.target.dataset.id); // display the edit row interface
+    }
+  });
 
-            deleteRowByUsername(event.target.dataset.id);   
-            rowToDelete = event.target.parentNode.parentNode.rowIndex;    
-            debug("delete which one: " + rowToDelete);
-        }   
-        if(event.target.className === "edit-row-btn"){
-            showEditRowInterface(event.target.dataset.id); // display the edit row interface
-        }
+function deleteRowByUsername(username) {
+  console.log("index.js: Deleting " + username);
+  fetch("http://localhost:5050/delete/" + username, {
+    method: "DELETE",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        document.getElementById("table").deleteRow(rowToDelete);
+        // location.reload();
       }
-);
-
-function deleteRowByUsername(username){
-    console.log("index.js: Deleting " + username)
-    fetch('http://localhost:5050/delete/' + username,
-       { 
-        method: 'DELETE'
-       }
-    )
-    .then(response => response.json())
-    .then(
-         data => {
-             if(data.success){
-                document.getElementById("table").deleteRow(rowToDelete);
-                // location.reload();
-             }
-         }
-    );
+    });
 }
 
 let idToUpdate = 0;
 
-function showEditRowInterface(id){
-    debug("id clicked: ");
-    debug(id);
-    document.querySelector('#update-name-input').value = ""; // clear this field
-    const updateSetction = document.querySelector("#update-row");  
-    updateSetction.hidden = false;
-    // we assign the id to the update button as its id attribute value
-    idToUpdate = id;
-    debug("id set!");
-    debug(idToUpdate+"");
+function showEditRowInterface(id) {
+  debug("id clicked: ");
+  debug(id);
+  document.querySelector("#update-name-input").value = ""; // clear this field
+  const updateSetction = document.querySelector("#update-row");
+  updateSetction.hidden = false;
+  // we assign the id to the update button as its id attribute value
+  idToUpdate = id;
+  debug("id set!");
+  debug(idToUpdate + "");
 }
-
 
 // when the update button on the update interface is clicked
-const updateBtn = document.querySelector('#update-row-btn');
+const updateBtn = document.querySelector("#update-row-btn");
 
-updateBtn.onclick = function(){
-    debug("update clicked");
-    debug("got the id: ");
-    debug(updateBtn.value);
-    
-    const updatedNameInput = document.querySelector('#update-name-input');
+updateBtn.onclick = function () {
+  debug("update clicked");
+  debug("got the id: ");
+  debug(updateBtn.value);
 
-    fetch('http://localhost:5050/update',
-          {
-            headers: {
-                'Content-type': 'application/json'
-            },
-            method: 'PATCH',
-            body: JSON.stringify(
-                  {
-                    id: idToUpdate,
-                    name: updatedNameInput.value
-                  }
-            )
-          }
-    ) 
-    .then(response => response.json())
-    .then(data => {
-        if(data.success){
-            location.reload();
-        }
-        else 
-           debug("no update occurs");
-    })
-}
+  const updatedNameInput = document.querySelector("#update-name-input");
 
+  fetch("http://localhost:5050/update", {
+    headers: {
+      "Content-type": "application/json",
+    },
+    method: "PATCH",
+    body: JSON.stringify({
+      username: idToUpdate,
+      firstname: updatedNameInput.value,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        location.reload();
+      } else debug("no update occurs");
+    });
+};
 
 // this function is used for debugging only, and should be deleted afterwards
-function debug(data)
-{
-    fetch('http://localhost:5050/debug', {
-        headers: {
-            'Content-type': 'application/json'
-        },
-        method: 'POST',
-        body: JSON.stringify({debug: data})
-    })
+function debug(data) {
+  fetch("http://localhost:5050/debug", {
+    headers: {
+      "Content-type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({ debug: data }),
+  });
 }
 
-function insertRowIntoTable(data){
+function insertRowIntoTable(data) {
+  debug("index.js: insertRowIntoTable called: ");
+  debug(data);
 
-   debug("index.js: insertRowIntoTable called: ");
-   debug(data);
+  const table = document.querySelector("table tbody");
+  debug(table);
 
-   const table = document.querySelector('table tbody');
-   debug(table);
-
-   const isTableData = table.querySelector('.no-data');
+  const isTableData = table.querySelector(".no-data");
 
   // debug(isTableData);
 
-   let tableHtml = "<tr>";
-   
-   for(var key in data){ // iterating over the each property key of an object data
-      if(data.hasOwnProperty(key)){   // key is a direct property for data
-            if(key === 'dateAdded'){  // the property is 'dataAdded'
-                data[key] = new Date(data[key]).toLocaleString(); // format to javascript string
-            }
-            tableHtml += `<td>${data[key]}</td>`;
+  let tableHtml = "<tr>";
+
+  for (var key in data) {
+    // iterating over the each property key of an object data
+    if (data.hasOwnProperty(key)) {
+      // key is a direct property for data
+      if (key === "dateAdded") {
+        // the property is 'dataAdded'
+        data[key] = new Date(data[key]).toLocaleString(); // format to javascript string
       }
-   }
-
-   tableHtml +=`<td><button class="delete-row-btn" data-id=${data.id}>Delete</td>`;
-   tableHtml += `<td><button class="edit-row-btn" data-id=${data.id}>Edit</td>`;
-
-   tableHtml += "</tr>";
-
-    if(isTableData){
-       debug("case 1");
-       table.innerHTML = tableHtml;
+      tableHtml += `<td>${data[key]}</td>`;
     }
-    else {
-        debug("case 2");
-        // debug(tableHtml);
+  }
 
-        const newrow = table.insertRow();
-        newrow.innerHTML = tableHtml;
-    }
+  tableHtml += `<td><button class="delete-row-btn" data-id=${data.id}>Delete</td>`;
+  tableHtml += `<td><button class="edit-row-btn" data-id=${data.id}>Edit</td>`;
+
+  tableHtml += "</tr>";
+
+  if (isTableData) {
+    debug("case 1");
+    table.innerHTML = tableHtml;
+  } else {
+    debug("case 2");
+    // debug(tableHtml);
+
+    const newrow = table.insertRow();
+    newrow.innerHTML = tableHtml;
+  }
 }
 
-function loadHTMLTable(data){
-    debug("index.js: loadHTMLTable called.");
+function loadHTMLTable(data) {
+  debug("index.js: loadHTMLTable called.");
 
-    const table = document.querySelector('table tbody'); 
-    
-    if(data.length === 0){
-        table.innerHTML = "<tr><td class='no-data' colspan='5'>No Data</td></tr>";
-        return;
-    }
-  
-    /*
+  const table = document.querySelector("table tbody");
+
+  if (data.length === 0) {
+    table.innerHTML = "<tr><td class='no-data' colspan='5'>No Data</td></tr>";
+    return;
+  }
+
+  const searchNeverSignedInBtn = document.querySelector(
+    "#search-never-signedin-btn"
+  );
+  searchNeverSignedInBtn.onclick = function () {
+    fetch("http://localhost:5050/searchNeverSignedIn")
+      .then((response) => response.json())
+      .then((data) => loadHTMLTable(data["data"]));
+  };
+
+  const searchRegisteredTodayBtn = document.querySelector(
+    "#search-registered-today-btn"
+  );
+  if (searchRegisteredTodayBtn) {
+    searchRegisteredTodayBtn.onclick = function () {
+      fetch("http://localhost:5050/searchRegisteredToday")
+        .then((response) => response.json())
+        .then((data) => loadHTMLTable(data["data"]));
+    };
+  }
+
+  /*
     In the following JavaScript code, the forEach method is used to iterate over the 
     elements of the data array. The forEach method is a higher-order function 
     that takes a callback function as its argument. The callback function is 
@@ -315,16 +322,16 @@ function loadHTMLTable(data){
     data array.
     */
 
-    let tableHtml = "";
-    data.forEach(row => {
-         tableHtml += "<tr>";
-         tableHtml +=`<td>${row.username}</td>`;
-         tableHtml +=`<td>${row.firstname}</td>`;
-         tableHtml +=`<td>${new Date(row.registerday).toLocaleString()}</td>`;
-         tableHtml +=`<td><button class="delete-row-btn" data-id=${row.username}>Delete</td>`;
-         tableHtml += `<td><button class="edit-row-btn" data-id=${row.username}>Edit</td>`;
-         tableHtml += "</tr>";
-    });
+  let tableHtml = "";
+  data.forEach((row) => {
+    tableHtml += "<tr>";
+    tableHtml += `<td>${row.username}</td>`;
+    tableHtml += `<td>${row.firstname}</td>`;
+    tableHtml += `<td>${new Date(row.registerday).toLocaleString()}</td>`;
+    tableHtml += `<td><button class="delete-row-btn" data-id=${row.username}>Delete</td>`;
+    tableHtml += `<td><button class="edit-row-btn" data-id=${row.username}>Edit</td>`;
+    tableHtml += "</tr>";
+  });
 
-    table.innerHTML = tableHtml;
+  table.innerHTML = tableHtml;
 }

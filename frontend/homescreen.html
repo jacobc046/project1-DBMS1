@@ -9,14 +9,14 @@
   <body>
     <main>
       <h1>Search for Users based on the following criteria:</h1>
-      <!-- <label>Name:</label>
+      <label>Name:</label>
       <input type="text" id="name-input" />
-      <button id="add-name-btn">Add Name</button> -->
+      <button id="add-name-btn">Add Name</button>
 
-      <!-- <br /><br /><br /> -->
+      <br /><br /><br />
 
       <!-- Search by name -->
-      <div>
+      <div class="form-row center">
         <input placeholder="first, last, or username" id="search-input" />
         <button id="search-btn">Search</button>
       </div>
@@ -65,6 +65,16 @@
         <button id="search-age-btn">Search</button>
       </div>
 
+      <div style="margin-top: 50px">
+        <label>Search by users who never signed in</label>
+        <button id="search-never-signedin-btn">Search</button>
+      </div>
+
+      <div style="margin-top: 30px">
+        <label>Search users who registered today</label>
+        <button id="search-registered-today-btn">Search</button>
+      </div>
+
       <br />
       <br />
 
@@ -85,7 +95,7 @@
         <button id="update-row-btn" value="">Update</button>
       </section>
 
-      <a href="index.html">Back to login</a>
+      <a href="index.html">Back to Login</a>
     </main>
     <script src="index.js"></script>
   </body>
