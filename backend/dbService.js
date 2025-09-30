@@ -1,12 +1,12 @@
 // database services, accessbile by DbService methods.
 
-const mysql = require("mysql");
-const dotenv = require("dotenv");
+const mysql = require('mysql');
+const dotenv = require('dotenv');
+const bcrypt = require('bcrypt');
+
 dotenv.config(); // read from .env file
 
-let instance = null;
-
-// if you use .env to configure
+let instance = null; 
 
 console.log("HOST: " + process.env.HOST);
 console.log("DB USER: " + process.env.DB_USER);
@@ -29,7 +29,11 @@ connection.connect((err) => {
   console.log("db " + connection.state); // to see if the DB is connected or not
 });
 
-// the following are database functions,
+async function hashPassword(plainPassword) {
+        const salt = await bcrypt.genSalt(10); // dont change this number - passwords will break
+        const hash = await bcrypt.hash(plainPassword, salt);
+        return hash;
+    }
 
 class DbService {
   static getDbServiceInstance() {
@@ -75,16 +79,85 @@ class DbService {
    to work with the asynchronous nature of the connection.query method, allowing 
    the function to pause until the query is completed.
    */
+    async getAllData(){
+        try{
+           // use await to call an asynchronous function
+           const response = await new Promise((resolve, reject) => 
+              {
+                  const query = "SELECT * FROM Users;";
+                  connection.query(query, 
+                       (err, results) => {
+                             if(err) reject(new Error(err.message));
+                             else resolve(results);
+                       }
+                  );
+               }
+            );
+        
+            // console.log("dbServices.js: search result:");
+            // console.log(response);  // for debugging to see the result of select
+            return response;
 
-  async getAllData() {
-    try {
-      // use await to call an asynchronous function
+        }  catch(error){
+           console.log(error);
+        }
+   }
+
+   async signUpUser(userData){
+         try{
+            const now = new Date();
+            const hashedPassword = await hashPassword(userData.password);
+
+            // use await to call an asynchronous function
+            const insertUser = await new Promise((resolve, reject) => 
+            {
+               const query = `INSERT INTO Users (username, password, firstname, lastname, salary, age, registerday, signintime)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
+               connection.query(query, [
+                  userData.username,
+                  hashedPassword,
+                  userData.firstName,
+                  userData.lastName,
+                  userData.salary,
+                  userData.age,
+                  now, //registerday
+                  now //signintime
+               ], (err, result) => {
+                   if(err) reject(new Error(err.message));
+                   else resolve(result.insertId);
+               });
+            });
+            //console.log(insertUser);  // for debugging to see the result of insert
+            return{
+                 username: userData.username,
+                 password: hashedPassword,
+                 firstname: userData.firstname,
+                 lastname: userData.lastname,
+                 salary: userData.salary,
+                 age: userData.age,
+                 registerday: registerDay,
+                 signintime: signInTime
+            }
+         } catch(error){
+               console.log("dbService: ERROR:", error);
+         }
+   }
+
+   async signInUser(userData) {
+      const hashedPassword = await hashPassword(userData.password);
+
       const response = await new Promise((resolve, reject) => {
-        const query = "SELECT * FROM Users;";
-        connection.query(query, (err, results) => {
-          if (err) reject(new Error(err.message));
-          else resolve(results);
-        });
+         const query = `SELECT username, password FROM Users WHERE username = ? AND password = ?;`;
+         connection.query(query, [userData.username, hashedPassword], (err, result) => {
+               if(err) reject(new Error(err.message));
+               else {
+                  if (result.length > 0) {
+                     resolve({ success: true, user: result[0] });
+                  } else {
+                     resolve({ success: false, message: "Invalid username or password" });
+                  }
+               }
+         });
       });
 
       return response;
