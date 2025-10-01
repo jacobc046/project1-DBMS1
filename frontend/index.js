@@ -70,23 +70,23 @@ document.addEventListener("DOMContentLoaded", function () {
     .then((data) => loadHTMLTable(data["data"]));
 });
 
-// when the addBtn is clicked
-const addBtn = document.querySelector("#add-name-btn");
-addBtn.onclick = function () {
-  const nameInput = document.querySelector("#name-input");
-  const name = nameInput.value;
-  nameInput.value = "";
+// // when the addBtn is clicked
+// const addBtn = document.querySelector("#add-name-btn");
+// addBtn.onclick = function () {
+//   const nameInput = document.querySelector("#name-input");
+//   const name = nameInput.value;
+//   nameInput.value = "";
 
-  fetch("http://localhost:5050/insert", {
-    headers: {
-      "Content-type": "application/json",
-    },
-    method: "POST",
-    body: JSON.stringify({ name: name }),
-  })
-    .then((response) => response.json())
-    .then((data) => insertRowIntoTable(data["data"]));
-};
+//   fetch("http://localhost:5050/insert", {
+//     headers: {
+//       "Content-type": "application/json",
+//     },
+//     method: "POST",
+//     body: JSON.stringify({ name: name }),
+//   })
+//     .then((response) => response.json())
+//     .then((data) => insertRowIntoTable(data["data"]));
+// };
 
 // when the searchBtn is clicked
 const searchBtn = document.querySelector("#search-btn");

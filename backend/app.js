@@ -35,13 +35,13 @@ app.post("/signup", (request, response) => {
 
   const userData = request.body;
   const db = dbService.getDbServiceInstance();
-
+  
+  
   const result = db.signUpUser(userData);
 
   // note that result is a promise
   result
     .then((data) => response.json({ data: data })) // return the newly added row to frontend, which will show it
-    //.then(data => console.log("app: {data: data}: ", {data: data})) // debug first before return by response
     .catch((err) => console.log("app: err: ", err));
 });
 

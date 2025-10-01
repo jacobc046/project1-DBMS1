@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const firstNameInput = document.querySelector("#first-name-input");
       const lastNameInput = document.querySelector("#last-name-input");
       const usernameInput = document.querySelector("#username-input");
-      const passwordInput = document.querySelector("#password-input"); // later: encrypt
+      const passwordInput = document.querySelector("#password-input");
       const ageInput = document.querySelector("#age-input");
       const salaryInput = document.querySelector("#salary-input");
 
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((response) => response.json())
         .then((data) => {
           console.log("Signup response:", data);
-          window.location.href = "index.html";
+          window.location.href = "/homescreen.html";
         })
         .catch((err) => console.error(err));
     };

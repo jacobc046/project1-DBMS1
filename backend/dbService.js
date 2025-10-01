@@ -30,10 +30,10 @@ connection.connect((err) => {
 });
 
 async function hashPassword(plainPassword) {
-        const salt = await bcrypt.genSalt(10); // dont change this number - passwords will break
-        const hash = await bcrypt.hash(plainPassword, salt);
-        return hash;
-    }
+  const salt = await bcrypt.genSalt(10); // dont change this number - passwords will break
+  const hash = await bcrypt.hash(plainPassword, salt);
+  return hash;
+}
 
 class DbService {
   static getDbServiceInstance() {
@@ -104,141 +104,73 @@ class DbService {
    }
 
    async signUpUser(userData){
-         try{
-            const now = new Date();
-            const hashedPassword = await hashPassword(userData.password);
+      const now = new Date();
+      const hashedPassword = await hashPassword(userData.password);
 
-            // use await to call an asynchronous function
-            const insertUser = await new Promise((resolve, reject) => 
-            {
-               const query = `INSERT INTO Users (username, password, firstname, lastname, salary, age, registerday, signintime)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
-               connection.query(query, [
-                  userData.username,
-                  hashedPassword,
-                  userData.firstName,
-                  userData.lastName,
-                  userData.salary,
-                  userData.age,
-                  now, //registerday
-                  now //signintime
-               ], (err, result) => {
-                   if(err) reject(new Error(err.message));
-                   else resolve(result.insertId);
-               });
+      try{
+        // use await to call an asynchronous function
+        const insertUser = await new Promise((resolve, reject) => 
+        {
+            const query = `INSERT INTO Users (username, password, firstname, lastname, salary, age, registerday, signintime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
+            connection.query(query, [
+              userData.username,
+              hashedPassword,
+              userData.firstName,
+              userData.lastName,
+              userData.salary,
+              userData.age,
+              now, //registerday
+              null //signintime
+            ], (err, result) => {
+                if(err) reject(new Error(err.message));
+                else resolve(result.insertId);
             });
-            //console.log(insertUser);  // for debugging to see the result of insert
-            return{
-                 username: userData.username,
-                 password: hashedPassword,
-                 firstname: userData.firstname,
-                 lastname: userData.lastname,
-                 salary: userData.salary,
-                 age: userData.age,
-                 registerday: registerDay,
-                 signintime: signInTime
-            }
-         } catch(error){
-               console.log("dbService: ERROR:", error);
-         }
+        });
+        //console.log(insertUser);  // for debugging to see the result of insert
+        return{
+              username: userData.username,
+              password: hashedPassword,
+              firstname: userData.firstName,
+              lastname: userData.lastName,
+              salary: userData.salary,
+              age: userData.age,
+              registerday: now,
+              signintime: null
+        }
+      } catch(error){
+            console.log("dbService: ERROR:", error);
+      }
    }
 
    async signInUser(userData) {
-      const hashedPassword = await hashPassword(userData.password);
-
-      const response = await new Promise((resolve, reject) => {
-         const query = `SELECT username, password FROM Users WHERE username = ? AND password = ?;`;
-         connection.query(query, [userData.username, hashedPassword], (err, result) => {
-               if(err) reject(new Error(err.message));
-               else {
-                  if (result.length > 0) {
-                     resolve({ success: true, user: result[0] });
-                  } else {
-                     resolve({ success: false, message: "Invalid username or password" });
-                  }
-               }
-         });
+    // 1. Fetch user by username
+    const user = await new Promise((resolve, reject) => {
+      const query = `SELECT username, password FROM Users WHERE username = ?`;
+      connection.query(query, [userData.username], (err, result) => {
+        if (err) reject(err);
+        else if (result.length === 0) resolve(null);
+        else resolve(result[0]);
       });
-
-      return response;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async signUpUser(userData) {
-    try {
-      const registerDay = new Date();
-      //const signInTime = new Date();
-      // use await to call an asynchronous function
-      const insertUser = await new Promise((resolve, reject) => {
-        const query = `INSERT INTO Users (username, password, firstname, lastname, salary, age, registerday, signintime)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
-        connection.query(
-          query,
-          [
-            userData.username,
-            userData.password,
-            userData.firstName,
-            userData.lastName,
-            userData.salary,
-            userData.age,
-            registerDay,
-            null,
-          ],
-          (err, result) => {
-            if (err) reject(new Error(err.message));
-            else resolve(result.insertId);
-          }
-        );
-      });
-      //console.log(insertUser);  // for debugging to see the result of insert
-      return {
-        username: userData.username,
-        password: userData.password,
-        firstname: userData.firstname,
-        lastname: userData.lastname,
-        salary: userData.salary,
-        age: userData.age,
-        registerday: registerDay,
-        signintime: null,
-      };
-    } catch (error) {
-      console.log("dbService: ERROR:", error);
-    }
-  }
-
-  async signInUser(userData) {
-    const response = await new Promise((resolve, reject) => {
-      const query = `SELECT username, password FROM Users WHERE username = ? AND password = ?;`;
-      connection.query(
-        query,
-        [userData.username, userData.password],
-        (err, result) => {
-          if (err) reject(new Error(err.message));
-          else {
-            if (result.length > 0) {
-              resolve({ success: true, user: result[0] });
-            } else {
-              resolve({
-                success: false,
-                message: "Invalid username or password",
-              });
-            }
-          }
-        }
-      );
     });
-    if (response.success) {
+
+    if (!user) {
+      return { success: false, message: "Invalid username or password" };
+    }
+
+    // 2. Compare provided password with stored hash
+    const match = await bcrypt.compare(userData.password, user.password);
+    if (match) {
       await new Promise((resolve, reject) => {
         const upd = `UPDATE Users SET signintime = NOW() WHERE username = ?;`;
         connection.query(upd, [userData.username], (err) =>
           err ? reject(err) : resolve()
         );
       });
+      return { success: true, user: { username: user.username } };
+    } else {
+      return { success: false, message: "Invalid username or password" };
     }
-
-    return response;
   }
 
   async insertNewName(name) {
