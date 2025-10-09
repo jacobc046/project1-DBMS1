@@ -1,0 +1,51 @@
+CREATE TABLE Users (
+username VARCHAR(50) PRIMARY KEY,
+password VARCHAR(100),
+firstname VARCHAR(50),
+lastname VARCHAR(50),
+salary FLOAT,
+age INT,
+registerday DATE,
+signintime DATETIME;
+
+SELECT * FROM Users;
+
+SELECT *
+         FROM Users
+         WHERE DATE(registerday) = (
+           SELECT DATE(registerday) FROM Users WHERE username = ?
+         );
+
+SELECT *
+         FROM Users
+         WHERE registerday > (
+           SELECT registerday FROM Users WHERE username = ?
+         );
+
+UPDATE Users SET signintime = NOW() WHERE username = ?;
+
+INSERT INTO names (name, date_added) VALUES (?, ?);
+
+SELECT * FROM Users WHERE firstname = ? OR lastname = ? OR username = ?;
+
+SELECT * FROM Users where salary >= ? AND salary <= ?;
+
+SELECT * FROM Users where age >= ? AND age <= ?;
+
+DELETE FROM Users WHERE username = ?;
+
+UPDATE Users SET firstname = ? WHERE username = ?;
+
+SELECT * FROM Users WHERE signintime IS NULL;
+
+SELECT * FROM Users WHERE DATE(registerday) = CURDATE();
+
+INSERT INTO Users (username, password, firstname, lastname, salary, age, registerday, signintime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+SELECT username, password FROM Users WHERE username = ?;
+
+UPDATE Users SET signintime = NOW() WHERE username = ?;
+
+INSERT INTO names (name, date_added) VALUES (?, ?);
+
+SELECT * FROM Users WHERE firstname = ? OR lastname = ? OR username = ?;
